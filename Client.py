@@ -2,8 +2,8 @@ from struct import *
 from socket import *
 import enum
 
-host = gethostname()
-localPORT = 2040
+HOST = gethostname()
+localPORT = 13117
 buffer_size = 2048
 
 
@@ -17,10 +17,7 @@ class Client:
     def __init__(self):
         self.team_name = "Mr. & Ms. Dor"
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
-        self.udp_socket.bind((localIP, localPORT))
-
         self.tcp_socket = socket(AF_INET, SOCK_STREAM)
-        self.tcp_socket.bind((localIP, localPORT))
 
         self.state = ClientState.searching
 
