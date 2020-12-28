@@ -81,5 +81,5 @@ class Server:
         broadcast_thread.start()
 
     def game_play(self, client_socket, address):
-            pass
+        self.state = ServerState.game_mode
 
