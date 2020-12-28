@@ -14,42 +14,78 @@ class ServerState(enum.Enum):
 
 
 class Server:
-    def __init__(self):
-        self.udp_socket = socket(AF_INET, SOCK_DGRAM)
+    def __init__(self,ip,port):
+        self.udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+        self.ip = ip
+        self.port = port
         self.tcp_socket = socket(AF_INET, SOCK_STREAM)
         self.state = ServerState.waiting_for_clients
         self.connections = {}
+        self.start = False
+        self.All_Teams = {}
+        self.TeamA = []
+        self.TeamB = []
         
 
-    def send_broadcast_messages(self):
+    def send_broadcast_messages(self, message):
         send_until = time.time() + 10
         while time.time() < send_until:
-            self.udp_socket.sendto(message_to_send, ('<broadcast>', 13117))
+            self.udp_socket.sendto(message, ('<broadcast>', 13117))
             time.sleep(1)
+        #RANDOM
+        self.start = True
+
+    def Handler(self,c):
+        teamName = c.recv(1024)
+        self.All_Teams[teamName.decode('utf8')]
+        while not self.start:
+            time.sleep(0.5)
+
+        #SEND MESSAGE
+        #Game - RECV
+        #Stastics
+        #Send Message
+
+        self.start = False
+
+    def TCPServer(self):
+        self.tcp_socket.bind((self.ip,self.port))
+        print(f'Server started, listening on IP address {SERVER_IP}')
+        self.tcp_socket.listen()
+        while True:
+            client_socket, addr = self.tcp_socket.accept()
+            handler_thread = Thread(target=self.Handler,args = (client_socket,))
+            handler_thread.start()
+
+
 
     def waiting_for_clients(self):
         """
             This function sends UDP broadcast messages each 1 sec
             for 10 seconds and listening for clients responses.
         """
-        self.udp_socket.bind(('', SERVER_PORT))
-        print(f'Server started, listening on IP address {SERVER_IP}')
+        # self.udp_socket.bind(('', SERVER_PORT))
+        self.udp_socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self.udp_socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self.udp_socket.settimeout(0.2)
         message_to_send = struct.pack('Ibh', 0xfeedbeef, 0x2, 0x7f8)
-        broadcast_thread = Thread(target=self.send_broadcast_messages())
-        broadcast_thread.start()
-        self.tcp_socket.settimeout(0.2)
-        while broadcast_thread.isAlive():
-            try:
-                client_socket, address = self.tcp_socket.accept()
-                self.connections[address] = client_socket
-            except socket.timeout:
-                continue
         
-        self.udp_socket.close()
+        server_thread = Thread(target=self.TCPServer)
+        server_thread.start()
+        
+        broadcast_thread = Thread(target=self.send_broadcast_messages,args=(message_to_send,))
+        broadcast_thread.start()
+
+        # self.tcp_socket.settimeout(0.2)
+        # while broadcast_thread.isAlive():
+        #     try:
+        #         client_socket, address = self.tcp_socket.accept()
+        #         self.connections[address] = client_socket
+        #     except socket.timeout:
+        #         continue
+        
+        # self.udp_socket.close()
 
     def game_play(self, client_socket, address):
             pass
 
-
-server = Server()
-server.waiting_for_clients()

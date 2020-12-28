@@ -21,19 +21,24 @@ class Client:
 
         self.state = ClientState.searching
 
-    def connect_to_server(self, server_address):
-        self.tcp_socket.connect(server_address)
+    def connect_to_server(self, server_address,port_from_message):
+        self.tcp_socket.connect(('localhost',2040))
+        self.tcp_socket.send(bytes(self.team_name,encoding='utf8'))
 
 
     def look_for_server(self):
-        while True:
-            message, server_address = self.udp_socket.recvfrom(buffer_size)
-            print(f'Received offer from {server_address}, attempting to connect...')
-
-            print(f'DEBUG: Server message: {message}')
-            print(f'DEBUG: Server IP: {server_address}')
-            self.state = ClientState.connecting
-            self.connect_to_server(server_address)
+        try:
+            self.udp_socket.bind(('',13117))
+        except:
+            pass
+        message, server_address = self.udp_socket.recvfrom(buffer_size)
+        print(f'Received offer from {server_address}, attempting to connect...')
+        #TODO: RECEIVE PORT FROM MSG
+        msg_port =''
+        print(f'DEBUG: Server message: {message}')
+        print(f'DEBUG: Server IP: {server_address}')
+        self.state = ClientState.connecting
+        self.connect_to_server(server_address,msg_port)
 
 
 
