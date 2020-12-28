@@ -14,13 +14,11 @@ class Client:
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.tcp_socket = socket(AF_INET, SOCK_STREAM)
 
-
     def connect_to_server(self, server_address, port_from_message):
         self.tcp_socket.connect(('localhost',2040))
 
         message_to_send = self.team_name + '\n'
         self.tcp_socket.send(bytes(message_to_send, encoding='utf-8'))
-
 
     def look_for_server(self):
         try:
@@ -33,12 +31,12 @@ class Client:
 
         print(f'Received offer from {server_address}, attempting to connect...')
         #TODO: RECEIVE PORT FROM MSG
-        msg_port =''
+        msg_port = ''
 
         print(f'DEBUG: Server message: {message}')
         print(f'DEBUG: Server IP: {server_address}')
 
-        self.connect_to_server(server_address,msg_port)
+        self.connect_to_server(server_address, msg_port)
 
 
 

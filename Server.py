@@ -1,4 +1,3 @@
-import enum
 import time
 from socket import *
 from threading import *
@@ -19,8 +18,8 @@ class Server:
         self.connections = {}
         self.start = False
         self.All_Teams = {}
-        self.TeamA = []
-        self.TeamB = []
+        self.Team1 = []
+        self.Team2 = []
         
 
     def send_broadcast_messages(self, message):
@@ -28,7 +27,6 @@ class Server:
         while time.time() < send_until:
             self.udp_socket.sendto(message, ('<broadcast>', 13117))
             time.sleep(1)
-        #RANDOM
         self.start = True
 
     def client_handler(self, client):
@@ -37,14 +35,22 @@ class Server:
         team_name = team_name.decode('utf-8')
         print(f'Team {team_name} connected!')
         self.All_Teams[team_name] = 0
-        
+
         # choose team for client - randomly
-        
+        group_choice = random.choice([0, 1])
+        if group_choice == 0:
+            self.Team1.append(team_name)
+            group = 'Team 1'
+        elif group_choice == 1:
+            self.Team2.append(team_name)
+            group = 'Team 2'
+        print(f'Team: {team_name} added to group {group}')
+
         while not self.start:
             time.sleep(0.2)
 
-        
-        r
+
+
         #SEND MESSAGE
         #Game - RECV
         #Stastics
@@ -81,5 +87,5 @@ class Server:
         broadcast_thread.start()
 
     def game_play(self, client_socket, address):
-        self.state = ServerState.game_mode
+        pass
 
