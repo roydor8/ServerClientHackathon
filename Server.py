@@ -44,7 +44,7 @@ class Server:
             time.sleep(0.2)
 
         
-        r
+        
         #SEND MESSAGE
         #Game - RECV
         #Stastics
