@@ -4,9 +4,10 @@ from Client import Client
 
 def main():
     server = Server('localhost', 2040)
-    client = Client()
-    server.waiting_for_clients()
-    client.look_for_server()
+    server.start_running()
+
+    client_Roy = Client()
+    client_Roy.start_running()
 
 
 if __name__ == '__main__':

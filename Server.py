@@ -10,13 +10,12 @@ SERVER_IP = gethostbyname(gethostname())
 
 
 class Server:
-    def __init__(self,ip,port):
+    def __init__(self, ip, port):
         self.udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
         self.ip = ip
         self.port = port
         self.tcp_socket = socket(AF_INET, SOCK_STREAM)
-        self.connections = {}
-        self.start = False
+        self.start_game = False
         self.All_Teams = {}
         self.Team1 = []
         self.Team2 = []
@@ -27,12 +26,28 @@ class Server:
         while time.time() < send_until:
             self.udp_socket.sendto(message, ('<broadcast>', 13117))
             time.sleep(1)
-        self.start = True
+        self.start_game = True
+
+    def game_play(self, client_socket):
+        #send Welcome message to client
+        welcome_message = "Welcome to Keyboard Spamming Battle Royale.\n"
+        welcome_message += "Group 1:\n =="
+        for team in self.Team1:
+            welcome_message += team + '\n'
+        welcome_message += "Group 2:\n =="
+        for team in self.Team2:
+            welcome_message += team + '\n'
+        welcome_message += "Start pressing keys on your keyboard as fast as you can!!"
+
+        client_socket.send(bytes(welcome_message, encoding='utf-8'))
+        
+
+
 
     def client_handler(self, client):
         print("Server: Connection Established!")
         team_name = client.recv(1024)
-        team_name = team_name.decode('utf-8')
+        team_name = team_name.decode('utf-8').strip('\n')
         print(f'Team {team_name} connected!')
         self.All_Teams[team_name] = 0
 
@@ -46,17 +61,18 @@ class Server:
             group = 'Team 2'
         print(f'Team: {team_name} added to group {group}')
 
-        while not self.start:
+        while not self.start_game:
             time.sleep(0.2)
 
+        self.game_play(client)
+
         
+
         
-        #SEND MESSAGE
         #Game - RECV
         #Stastics
         #Send Message
-
-        self.start = False
+        self.start_game = False
 
     def TCPServer(self):
         self.tcp_socket.bind((self.ip,self.port))
@@ -69,7 +85,7 @@ class Server:
 
 
 
-    def waiting_for_clients(self):
+    def start_running(self):
         """
             This function sends UDP broadcast messages each 1 sec
             for 10 seconds and listening for clients responses.
@@ -86,5 +102,4 @@ class Server:
         broadcast_thread = Thread(target=self.send_broadcast_messages,args=(message_to_send,))
         broadcast_thread.start()
 
-    def game_play(self, client_socket, address):
-        pass
+    
