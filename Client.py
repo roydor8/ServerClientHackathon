@@ -118,6 +118,7 @@ class Client:
                 message = str(message, 'utf-8')
                 print(message)
                 break
+        self.udp_socket.close()
 
 
 while True:

@@ -105,7 +105,7 @@ class Server:
         play_until = time.time() + 10
         while time.time() <= play_until:
             try:
-                incoming_char, a, b = select([client_socket],[],[],0.2)
+                incoming_char, _, _ = select([client_socket],[],[],0.2)
                 if incoming_char:
                     char_from_client = client_socket.recv(2048).decode()
             except:
