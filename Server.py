@@ -136,7 +136,7 @@ class Server:
         for team_name in self.Team2:
             points_team2 += self.Team2[team_name]
 
-        game_over_msg = "Game over!\n"
+        game_over_msg = "\nGame over!\n"
         game_over_msg += f"Group 1 typed in " + str(points_team1) + " characters. Group 2 typed in " + str(points_team2) + " characters."
 
         winner = 0
@@ -149,7 +149,7 @@ class Server:
         else:
             game_over_msg += "\nIt's a draw!"
         game_over_msg += "\n"
-        game_over_msg += "\nCongratulations to the winners:\n=="
+        game_over_msg += "\nCongratulations to the winners:\n==\n"
         if winner == 1:
             for team_name in self.Team1:
                 game_over_msg += team_name + "\n"
