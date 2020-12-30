@@ -12,7 +12,7 @@ from select import select
 CLIENT_IP = '127.0.0.1' 
 # CLIENT_IP = gethostbyname(gethostname())
 localPORTUDP = 13117
-localPORTTCP = 12346  # todo switch back to 2040
+localPORTTCP = 13212  # todo switch back to 2040
 BUFFER_SIZE = 1024
 
 
@@ -34,7 +34,7 @@ class Client:
                 msg_type = unpacked_msg[1]
                 server_port = unpacked_msg[2]
                 server_ip = server_address[0]
-                if magic_cookie != 0xfeedbeea or msg_type != 0x2:
+                if magic_cookie != 0xfeedbeeb or msg_type != 0x2:
                     continue
                 print(f'Received offer from {server_ip}, attempting to connect...')
                 self.connect_to_server(server_ip, server_port)
@@ -53,8 +53,8 @@ class Client:
     def connect_to_server(self, server_ip, server_port):
         # self.tcp_socket.bind((server_ip, localPORTTCP))
         self.tcp_socket.bind(('localhost', localPORTTCP))
-        # self.tcp_socket.connect(('localhost', server_port))
-        self.tcp_socket.connect((server_ip, server_port))
+        self.tcp_socket.connect(('localhost', server_port))
+        # self.tcp_socket.connect((server_ip, server_port))
         print("Connected to Server")
 
     def send_to_server(self, event):

@@ -24,7 +24,7 @@ class Server:
         self.is_broadcasting = False
         self.next_team_to_append = 0
         self.connections = {}
-        self.All_Teams = {}
+        self.team_statistics = {}
         self.Team1 = {}
         self.Team2 = {}
         self.team_threads = {}
@@ -57,7 +57,7 @@ class Server:
                 continue
 
     def send_broadcast_to_clients(self):
-        broad_message = struct.pack('Ibh', 0xfeedbeea, 0x2, self.port)
+        broad_message = struct.pack('Ibh', 0xfeedbeeb, 0x2, self.port)
         send_until = time.time() + 10
         self.is_broadcasting = True
         # counter = 1
@@ -90,6 +90,7 @@ class Server:
 
     def team_starts_game(self, team_name):
         client_socket = self.connections[team_name][0]
+
         # send a start-game message to client
         msg = "Welcome to Keyboard Spamming Battle Royale.\n"
         msg += "Group 1:\n==\n"
@@ -101,6 +102,8 @@ class Server:
         msg += "Start pressing keys on your keyboard as fast as you can!!"
         client_socket.send(msg.encode())
 
+        self.team_statistics[team_name] = {}
+
         count_press = 0
         play_until = time.time() + 10
         while time.time() <= play_until:
@@ -108,10 +111,14 @@ class Server:
                 incoming_char, _, _ = select([client_socket],[],[],0.2)
                 if incoming_char:
                     char_from_client = client_socket.recv(2048).decode()
+                    if char_from_client in self.team_statistics[team_name]:
+                        self.team_statistics[team_name][char_from_client] += 1
+                    else:
+                        self.team_statistics[team_name][char_from_client] = 1
+                    count_press += 1
             except:
                 continue
-            #print(char_from_client)
-            count_press += 1
+            
         print("Time finished")
         if team_name in self.Team1:
             self.Team1[team_name] = count_press
@@ -149,6 +156,7 @@ class Server:
         else:
             game_over_msg += "\nIt's a draw!"
         game_over_msg += "\n"
+        
         game_over_msg += "\nCongratulations to the winners:\n==\n"
         if winner == 1:
             for team_name in self.Team1:
